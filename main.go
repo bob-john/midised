@@ -35,7 +35,7 @@ func main() {
 
 	default:
 		if flag.NArg() == 0 {
-			fmt.Print("midiseq: missing command\n")
+			fmt.Print("midiseq: missing a command, try -h\n")
 		} else {
 			fmt.Printf("midiseq: unknown command %q\n", flag.Arg(0))
 		}
