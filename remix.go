@@ -8,7 +8,8 @@ import (
 )
 
 type Remix struct {
-	Begin, End int
+	Beats    Range
+	Channels Range
 }
 
 var ErrRemixSyntax = errors.New("remix: syntax error")
@@ -21,7 +22,7 @@ func ParseRemix(s string) (*Remix, error) {
 
 func (r *Remix) Apply(s EventList) (d EventList) {
 	d = make([]*Event, 0, cap(s))
-	var begin, end = r.Begin * 24, r.End * 24
+	var begin, end = r.Beats.First() * 24, r.Beats.Last() * 24
 	var t0 time.Duration
 	for _, e := range s {
 		if e.Tick < begin {
@@ -38,4 +39,14 @@ func (r *Remix) Apply(s EventList) (d EventList) {
 		d = append(d, e)
 	}
 	return
+}
+
+type Range [2]int
+
+func (r Range) First() int {
+	return r[0]
+}
+
+func (r Range) Last() int {
+	return r[1]
 }

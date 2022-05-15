@@ -32,16 +32,31 @@ func (l *Lexer) Int() (n int, ok bool) {
 	}
 }
 
-func (l *Lexer) Colon() (s string, ok bool) {
+func (l *Lexer) Char(c rune) (string, bool) {
 	l.Skim()
 	r, eof := l.ReadRune()
 	if eof {
-		return
+		return "", false
 	}
-	if r == ':' {
-		s, ok = ":", true
+	if r == c {
+		return string(r), true
 	}
-	return
+	l.r.UnreadRune()
+	return "", false
+}
+
+func (l *Lexer) Range() (Range, bool) {
+	var r Range
+	if i, ok := l.Int(); ok {
+		r[0] = i
+	}
+	if _, ok := l.Char(':'); !ok {
+		return r, false
+	}
+	if i, ok := l.Int(); ok {
+		r[1] = i
+	}
+	return r, true
 }
 
 func (l *Lexer) Skim() {
@@ -57,7 +72,7 @@ func (l *Lexer) Skim() {
 	}
 }
 
-func (l *Lexer) IsEOF() bool {
+func (l *Lexer) Done() bool {
 	return l.eof
 }
 

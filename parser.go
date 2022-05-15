@@ -1,6 +1,8 @@
 package main
 
-import "io"
+import (
+	"io"
+)
 
 type Parser struct {
 	l *Lexer
@@ -11,18 +13,22 @@ func NewParser(r io.Reader) *Parser {
 }
 
 func (p *Parser) Parse() (r Remix) {
-	if i, ok := p.l.Int(); ok {
-		r.Begin = i
-	}
-	if _, ok := p.l.Colon(); !ok {
-		panic("parser: expect ':'")
-	}
-	if i, ok := p.l.Int(); ok {
-		r.End = i
-	} else if p.l.IsEOF() {
-		r.End = -1
-	} else {
-		panic("parser: expect integer")
+	for !p.l.Done() {
+		if _, ok := p.l.Char('C'); ok {
+			if v, ok := p.l.Range(); ok {
+				r.Channels = v
+			} else {
+				panic("parser: expect range 'first:last' after 'C'")
+			}
+		} else if _, ok := p.l.Char('B'); ok {
+			if v, ok := p.l.Range(); ok {
+				r.Beats = v
+			} else {
+				panic("parser: expect range 'first:last' after 'B'")
+			}
+		} else if !p.l.Done() {
+			panic("parser: expect 'C' or 'B'")
+		}
 	}
 	return
 }
