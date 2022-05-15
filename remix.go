@@ -32,7 +32,7 @@ func ParseRemix(s string) (*Remix, error) {
 
 func (r *Remix) Apply(s EventList) (d EventList) {
 	d = make([]*Event, 0, cap(s))
-	var begin, end = (r.Begin - 1) * 24, r.End * 24
+	var begin, end = r.Begin * 24, r.End * 24
 	var t0 time.Duration
 	for _, e := range s {
 		if e.Tick < begin {
