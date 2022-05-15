@@ -16,6 +16,18 @@ type Event struct {
 	IsRealTime bool
 }
 
+func (e Event) IsNoteOn() bool {
+	return e.Raw[0]&0xF0 == 0x90 && e.Raw[2] > 0
+}
+
+func (e Event) IsNoteOff() bool {
+	return e.Raw[0]&0xF0 == 0x80 && (e.Raw[0]&0xF0 == 0x90 && e.Raw[2] == 0)
+}
+
+func (e Event) NoteOff() string {
+	return hex.EncodeToString([]byte{0x80 | e.Raw[0]&0x0F, e.Raw[1], 0})
+}
+
 type EventList []*Event
 
 func ReadEventList(r io.Reader) (ls EventList) {
