@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/hex"
 	"flag"
 	"fmt"
 	"os"
@@ -27,11 +28,17 @@ func main() {
 		timestamp()
 
 	case "play":
-		if flag.NArg() != 2 {
+		var (
+			cmd     = flag.NewFlagSet("play", flag.ExitOnError)
+			channel = cmd.Int("channel", 0, "midi output channel")
+		)
+		cmd.Parse(os.Args[2:])
+		fmt.Println(cmd.Args())
+		if cmd.NArg() != 1 {
 			fmt.Print("midiseq: invalid argument count\n")
 			os.Exit(2)
 		}
-		play(flag.Arg(1))
+		play(cmd.Arg(0), *channel)
 
 	default:
 		if flag.NArg() == 0 {
@@ -50,7 +57,7 @@ func timestamp() {
 	}
 }
 
-func play(name string) {
+func play(name string, channel int) {
 	type event struct {
 		time    time.Duration
 		delta   time.Duration
@@ -71,15 +78,21 @@ func play(name string) {
 		t, err := time.Parse(time.RFC3339Nano, c[0])
 		check(err)
 		if t0.IsZero() {
-			t0 = t
+			t0, lt = t, t
 		}
-		if len(c) == 1 || strings.HasPrefix(c[1], "F") || strings.HasPrefix(c[1], "f") {
-			if lt.IsZero() {
-				lt = t0
-			}
+		if len(c) == 1 {
 			continue
 		}
-		events = append(events, event{t.Sub(t0), t.Sub(lt), c[1]})
+		m, err := hex.DecodeString(c[1])
+		check(err)
+		if m[0]&0xF0 == 0xF0 {
+			continue
+		}
+		if channel > 0 && m[0] >= 0x80 && m[0] <= 0xEF {
+			m[0] &= 0xF0
+			m[0] |= byte(channel-1) & 0xF
+		}
+		events = append(events, event{t.Sub(t0), t.Sub(lt), hex.EncodeToString(m)})
 		lt = t
 	}
 	var j int
