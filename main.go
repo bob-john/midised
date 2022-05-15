@@ -14,8 +14,8 @@ func main() {
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
 		flag.PrintDefaults()
 		fmt.Fprintf(flag.CommandLine.Output(), "Commands:\n")
-		fmt.Fprintf(flag.CommandLine.Output(), "\ttimestamp\tadd timestamp, by eg. `midicat in | midised timestamp > record.txt`\n")
-		fmt.Fprintf(flag.CommandLine.Output(), "\tplay [FILE]\toutput message according to the timestamps, by eg. `midised play record.txt | midicat out`\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "\ttimestamp\tadd timestamp, by eg. `midicat in | midiseq timestamp > record.txt`\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "\tplay [FILE]\toutput message according to the timestamps, by eg. `midiseq play record.txt | midicat out`\n")
 	}
 	flag.Parse()
 	switch flag.Arg(0) {

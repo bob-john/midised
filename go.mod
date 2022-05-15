@@ -1,3 +1,3 @@
-module github.com/bob-john/midised
+module github.com/bob-john/midiseq
 
 go 1.17
