@@ -1,8 +1,7 @@
 package main
 
 import (
-	"strconv"
-	"strings"
+	"bytes"
 	"time"
 
 	"github.com/pkg/errors"
@@ -15,19 +14,9 @@ type Remix struct {
 var ErrRemixSyntax = errors.New("remix: syntax error")
 
 func ParseRemix(s string) (*Remix, error) {
-	c := strings.Split(s, ":")
-	if len(c) != 2 {
-		return nil, errors.WithStack(ErrRemixSyntax)
-	}
-	b, err := strconv.Atoi(c[0])
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	e, err := strconv.Atoi(c[1])
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	return &Remix{b, e}, nil
+	p := NewParser(bytes.NewReader([]byte(s)))
+	r := p.Parse()
+	return &r, nil
 }
 
 func (r *Remix) Apply(s EventList) (d EventList) {
@@ -41,7 +30,7 @@ func (r *Remix) Apply(s EventList) (d EventList) {
 		if t0 == 0 {
 			t0 = e.Time
 		}
-		if e.Tick >= end {
+		if end > 0 && e.Tick >= end {
 			break
 		}
 		e.Time -= t0
