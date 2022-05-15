@@ -20,7 +20,9 @@ func Play(ls EventList) {
 		for i = j; i < len(ls); i++ {
 			var e = ls[i]
 			if e.Time <= t {
-				fmt.Fprintln(os.Stdout, e.Message)
+				if !e.IsRealTime {
+					fmt.Fprintln(os.Stdout, e.Message)
+				}
 			} else {
 				break
 			}

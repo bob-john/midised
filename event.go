@@ -9,10 +9,11 @@ import (
 )
 
 type Event struct {
-	Time    time.Duration
-	Tick    int
-	Message string
-	Raw     []byte
+	Time       time.Duration
+	Tick       int
+	Message    string
+	Raw        []byte
+	IsRealTime bool
 }
 
 type EventList []*Event
@@ -43,10 +44,7 @@ func ReadEventList(r io.Reader) (ls EventList) {
 		if m[0] == 0xF8 {
 			tick++
 		}
-		if m[0]&0xF0 == 0xF0 {
-			continue
-		}
-		ls = append(ls, &Event{t.Sub(t0), tick, hex.EncodeToString(m), m})
+		ls = append(ls, &Event{t.Sub(t0), tick, hex.EncodeToString(m), m, m[0]&0xF0 == 0xF0})
 	}
 	return
 }

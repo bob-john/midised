@@ -56,8 +56,6 @@ func timestamp() {
 }
 
 func play(name string, remix string, channel int) {
-	// var r, err = ParseRemix(remix)
-	// check(err)
 	f, err := os.Open(name)
 	check(err)
 	defer f.Close()
@@ -66,6 +64,9 @@ func play(name string, remix string, channel int) {
 	if channel > 0 {
 		ls.SetChannel(channel)
 	}
+	r, err := ParseRemix(remix)
+	check(err)
+	ls = r.Apply(ls)
 	Play(ls)
 }
 
